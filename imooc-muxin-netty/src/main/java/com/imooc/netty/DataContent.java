@@ -1,5 +1,7 @@
 package com.imooc.netty;
 
+import com.imooc.pojo.ChatMsg;
+
 import java.io.Serializable;
 
 public class DataContent implements Serializable {
