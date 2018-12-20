@@ -1,6 +1,6 @@
 package com.imooc.service;
 
-import com.imooc.pojo.ChatMsg;
+import com.imooc.netty.ChatMsg;
 import com.imooc.pojo.Users;
 import com.imooc.pojo.vo.FriendRequestVO;
 import com.imooc.pojo.vo.MyFriendsVO;

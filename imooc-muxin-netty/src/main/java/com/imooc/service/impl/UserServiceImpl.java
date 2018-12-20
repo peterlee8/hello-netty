@@ -1,11 +1,12 @@
 package com.imooc.service.impl;
 
 import com.imooc.enums.MsgActionEnum;
+import com.imooc.enums.MsgSignFlagEnum;
 import com.imooc.enums.SearchFriendsStatusEnum;
 import com.imooc.mapper.*;
 import com.imooc.netty.DataContent;
 import com.imooc.netty.UserChannelRel;
-import com.imooc.pojo.ChatMsg;
+import com.imooc.netty.ChatMsg;
 import com.imooc.pojo.FriendsRequest;
 import com.imooc.pojo.MyFriends;
 import com.imooc.pojo.Users;
@@ -238,21 +239,42 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public List<MyFriendsVO> queryMyFriends(String userId) {
-        return null;
+        List<MyFriendsVO> myFirends = usersMapperCustom.queryMyFriends(userId);
+        return myFirends;
     }
 
     @Override
     public String saveMsg(ChatMsg chatMsg) {
-        return null;
+        com.imooc.pojo.ChatMsg msgDB = new com.imooc.pojo.ChatMsg();
+        String msgId = sid.nextShort();
+        msgDB.setId(msgId);
+        msgDB.setAcceptUserId(chatMsg.getReceiverId());
+        msgDB.setSendUserId(chatMsg.getSenderId());
+        msgDB.setCreateTime(new Date());
+        msgDB.setSignFlag(MsgSignFlagEnum.unsign.type);
+        msgDB.setMsg(chatMsg.getMsg());
+
+        chatMsgMapper.insert(msgDB);
+
+        return msgId;
     }
 
     @Override
     public void updateMsgSigned(List<String> msgIdList) {
-
+        usersMapperCustom.batchUpdateMsgSigned(msgIdList);
     }
 
+    @Transactional(propagation = Propagation.SUPPORTS)
     @Override
-    public List<ChatMsg> getUnReadMsgList(String acceptUserId) {
-        return null;
+    public List<com.imooc.pojo.ChatMsg> getUnReadMsgList(String acceptUserId) {
+
+        Example chatExample = new Example(com.imooc.pojo.ChatMsg.class);
+        Criteria chatCriteria = chatExample.createCriteria();
+        chatCriteria.andEqualTo("signFlag", 0);
+        chatCriteria.andEqualTo("acceptUserId", acceptUserId);
+
+        List<com.imooc.pojo.ChatMsg> result = chatMsgMapper.selectByExample(chatExample);
+
+        return result;
     }
 }
